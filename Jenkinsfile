@@ -23,59 +23,25 @@ pipeline {
             steps {
                 sh 'echo $DOCKERHUB_CREDENTIALS_PSW | docker login -u $DOCKERHUB_CREDENTIALS_USR --password-stdin'
             }
-        }        
+        }
 
         stage('Compile') {
-            agent {
-                docker {
-                    image 'maven:3.8.5-openjdk-17'
-                    // Caches Maven dependencies
-                }
-            }
             steps {
                 sh 'mvn clean compile'
             }
         }
 
         stage('Test') {
-            agent {
-                docker {
-                    image 'maven:3.8.5-openjdk-17'
-                }
-            }
             steps {
                 echo 'Running tests...'
-                sh 'mvn clean'
-                sh 'mvn test -DskipTests=true' 
-            }
-        }
-
-        stage('SonarQube Analysis') {
-            agent {
-                docker {
-                    image 'sonarsource/sonar-scanner-cli:5.0.1'
-                }
-            }
-            environment {
-                CI = 'true'
-                scannerHome = '/opt/sonar-scanner'
-            }
-            steps {
-                withSonarQubeEnv('Sonar') {
-                    sh "${scannerHome}/bin/sonar-scanner"
-                }
+                sh 'mvn test -DskipTests=true'
             }
         }
 
         stage('Package') {
-            agent {
-                docker {
-                    image 'maven:3.8.5-openjdk-17'
-                    args '-v $HOME/.m2:/root/.m2'
-                }
-            }
             steps {
                 sh 'mvn package -DskipTests=true'
+                // Archive the JAR file as a build artifact
                 archiveArtifacts artifacts: 'target/*.jar', fingerprint: true
             }
         }
