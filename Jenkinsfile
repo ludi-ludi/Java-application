@@ -22,13 +22,13 @@ pipeline {
             }   
         }
         
-        stage('clean env') {
-            steps {
-                sh '''
-            docker system prune -fa || true
-                '''
-            }
-        }
+        // stage('clean env') {
+        //     steps {
+        //         sh '''
+        //     docker system prune -fa || true
+        //         '''
+        //     }
+        // }
 
         stage('Login') {
 
