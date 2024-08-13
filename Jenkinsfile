@@ -91,9 +91,15 @@ pipeline {
         }
 
         stage('Build and Push Docker Image') {
+            agent {
+                docker {
+                    image 'maven:3.8.5-openjdk-17'
+                }
+            }
            steps {
                 script {
                     def imageName = 'devopseasylearning/s5ludivine:javaapp-$BUILD_NUMBER'
+                    sh "mvn package -DskipTests=true "
                     sh "docker build -t $imageName ."
                     sh "docker push $imageName"
                 }
