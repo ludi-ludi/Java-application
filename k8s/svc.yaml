@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: commercial-card
+spec:
+  type: NodePort
+  selector:
+    app: commercial-card
+  ports:
+    - port: 8080
+      targetPort: 4567
+      
+      
