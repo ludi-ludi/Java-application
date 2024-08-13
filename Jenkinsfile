@@ -1,16 +1,27 @@
 pipeline {
     agent any
 
+   
     environment {
-		DOCKERHUB_CREDENTIALS=credentials('docker-cred')
-	}
+        DOCKERHUB_CREDENTIALS = credentials('del-docker-hub-auth')
+    }
 
-
-
-    
-
+     options {
+        buildDiscarder(logRotator(numToKeepStr: '5'))
+        disableConcurrentBuilds()
+        timeout(time: 60, unit: 'MINUTES')
+        timestamps()
+    }
 
     stages {
+        
+        stage('Checkout') {
+        
+            steps {
+              git branch: 'main', url: 'https://github.com/ludi-ludi/Java-application.git' 
+            }   
+        }
+        
         stage('clean env') {
             steps {
                 sh '''
@@ -18,6 +29,7 @@ pipeline {
                 '''
             }
         }
+
         stage('Login') {
 
 			steps {
@@ -31,9 +43,6 @@ pipeline {
             }
         }
 
-        
-
-
 
         stage('Test') {
             steps {
@@ -42,157 +51,40 @@ pipeline {
         }
 
 
-        stage('File System Scan') {
+        stage('SonarQube analysis') {
+            agent {
+                docker {
+                    image 'sonarsource/sonar-scanner-cli:5.0.1'
+                }
+            }
+            environment {
+                CI = 'true'
+                scannerHome = '/opt/sonar-scanner'
+            }
             steps {
-                sh "trivy fs --format table -o trivy-fs-report.html ."
+                withSonarQubeEnv('Sonar') {
+                    sh "${scannerHome}/bin/sonar-scanner"
+                }
             }
         }
-
-    //    stage('SonarQube analysis') {
-    //        agent {
-    //            docker {
-    //              image 'sonarsource/sonar-scanner-cli:4.8.0'
-    //            }
-    //           }
-    //           environment {
-    //    CI = 'true'
-    //    scannerHome='/opt/sonar-scanner'
-    //    }
-    //        steps{
-    //            withSonarQubeEnv('sonar') {
-    //                sh "${scannerHome}/bin/sonar-scanner"
-    //            }
-    //    }
-    stage('Build') {
+  
+        stage('Build') {
             steps {
                sh "mvn package -DskipTests=true "
             }
     
-    }
-    stage('Build-images') {
-            steps {
-                sh '''
-              docker build -t  fridade/comm-card:jenkins-$BUILD_NUMBER .
+        }
 
-                '''
-            }
-
-    }
-    stage('Docker Image Scan') {
-            steps {
-                sh "trivy image --format table -o trivy-image-report.html fridade/comm-card:jenkins-$BUILD_NUMBER "
+        stage('Build and Push Docker Image') {
+           steps {
+                script {
+                    def imageName = 'devopseasylearning/s5ludivine:javaapp-$BUILD_NUMBER'
+                    sh "docker build -t $imageName ."
+                    sh "docker push $imageName"
+                }
             }
         }
 
-   
-
-    stage('Push-ui') {
-          
-            steps {
-               sh 'docker push fridade/comm-card:jenkins-$BUILD_NUMBER'
-            }
-    }
-    stage('helm-charts') {
-
-
-	      steps {
-	        script {
-	          withCredentials([
-	            string(credentialsId: 'github-cred', variable: 'TOKEN')
-	          ]) {
-
-	            sh '''
-                rm -rf commercial-card || true 
-                git clone https://$TOKEN@github.com/fridade/commercial-card.git
-                cd commercial-card
-cat << EOF > values.yaml
-       repository:
-         tag:   jenkins-$BUILD_NUMBER
-         assets:
-          image: fridade/comm-card
-       
-         
-EOF
-git config --global user.name "fridade"
-git config --global user.email "info@fridade.com"
-   cat  values.yaml
-   
-   git add -A 
-    git commit -m "Change from JENKINS" 
-    git push  https://fridade:$TOKEN@github.com/fridade/commercial-card.git
-	            '''
-	          }
-
-	        }
-
-	      }
-
-	    }
-
-
-      
-
-
-
-
-       
-        
-
-
-
-
-
-   
-   
-   
-   
-   
-   
-   
-   
-   
-   
-   
-   
-   
-   
-   
-   
-   
-   
-   
-   
-   
    }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 }
+
