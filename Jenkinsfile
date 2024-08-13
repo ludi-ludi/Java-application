@@ -48,14 +48,19 @@ pipeline {
             }
         }
 
-
         stage('Test') {
+            agent {
+                docker {
+                    image 'maven:3.8.5-openjdk-17'
+                }
+            }
             steps {
-                sh "mvn test  -DskipTests=true"
+                echo 'Running tests...'
+                sh 'mvn clean'
+                sh 'mvn test -DskipTests=true' 
+                 
             }
         }
-
-
         stage('SonarQube analysis') {
             agent {
                 docker {
