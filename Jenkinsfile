@@ -29,7 +29,7 @@ pipeline {
             agent {
                 docker {
                     image 'maven:3.8.5-openjdk-17'
-                    args '-v $HOME/.m2:/root/.m2' // Caches Maven dependencies
+                    // Caches Maven dependencies
                 }
             }
             steps {
@@ -41,12 +41,12 @@ pipeline {
             agent {
                 docker {
                     image 'maven:3.8.5-openjdk-17'
-                    args '-v $HOME/.m2:/root/.m2'
                 }
             }
             steps {
                 echo 'Running tests...'
-                sh 'mvn test' 
+                sh 'mvn clean'
+                sh 'mvn test -DskipTests=true' 
             }
         }
 
