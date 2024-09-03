@@ -20,7 +20,7 @@ pipeline {
                   ''' 
             }
         }
-        
+
         stage('Checkout') {
             steps {
                 git branch: 'main', url: 'https://github.com/ludi-ludi/Java-application.git'
@@ -104,6 +104,13 @@ pipeline {
                 }
             }
         }
+
+        stage('deploy with docker') {
+            steps {
+                sh 'docker run -itd -p 1971:8080 devopseasylearning/s5ludivine:javaapp-$BUILD_NUMBER'
+            }
+        }
+
     }
 }
 
