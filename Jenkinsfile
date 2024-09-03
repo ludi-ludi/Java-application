@@ -13,6 +13,14 @@ pipeline {
     }
 
     stages {
+        stage('Clean env') {
+            steps {
+               sh '''
+            docker system prune -fa || true
+                  ''' 
+            }
+        }
+        
         stage('Checkout') {
             steps {
                 git branch: 'main', url: 'https://github.com/ludi-ludi/Java-application.git'
