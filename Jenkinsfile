@@ -231,7 +231,7 @@ pipeline {
 
         stage('Deploy with Docker') {
             steps {
-                sh 'docker run -itd -p 1973:8080 devopseasylearning/s5ludivine:javaapp-$BUILD_NUMBER'
+                sh 'docker run -itd -p 1972:8080 devopseasylearning/s5ludivine:javaapp-$BUILD_NUMBER'
             }
         }
 
