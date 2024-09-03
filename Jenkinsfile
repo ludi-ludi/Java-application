@@ -229,11 +229,11 @@ pipeline {
             }
         }
 
-        stage('Deploy with Docker') {
-            steps {
-                sh 'docker run -itd -p 1972:8080 devopseasylearning/s5ludivine:javaapp-$BUILD_NUMBER'
-            }
-        }
+        // stage('Deploy with Docker') {
+        //     steps {
+        //         sh 'docker run -itd -p 1972:8080 devopseasylearning/s5ludivine:javaapp-$BUILD_NUMBER'
+        //     }
+        // }
 
         stage('Retrieve the Public IP Address') {
             steps {
@@ -269,14 +269,14 @@ pipeline {
         }
 
         // Helm Deployment Stage
-        // stage('Deploy with Helm') {
-        //     steps {
-        //         sh """
-        //         helm upgrade --install my-java-app ./java-application \
-        //             --values ./java-application/dev-values.yaml
-        //         """
-        //     }
-        // }
+        stage('Deploy with Helm') {
+            steps {
+                sh """
+                helm upgrade --install my-java-app ./java-application \
+                    --values ./java-application/dev-values.yaml
+                """
+            }
+        }
 
     }
 }
