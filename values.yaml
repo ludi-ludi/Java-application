@@ -1,6 +1,7 @@
-       repository:
-         tag:   jenkins-24
-         assets:
-          image: fridade/comm-card
-       
+ # values.yaml
+image:
+  repository: devopseasylearning/s5ludivine
+  tag: javaapp-$BUILD_NUMBER
+  pullPolicy: IfNotPresent
+     
          
