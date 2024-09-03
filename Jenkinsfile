@@ -107,7 +107,13 @@ pipeline {
 
         stage('deploy with docker') {
             steps {
-                sh 'docker run -itd -p 1971:8080 devopseasylearning/s5ludivine:javaapp-$BUILD_NUMBER'
+                sh 'docker run -itd -p 1972:8080 devopseasylearning/s5ludivine:javaapp-$BUILD_NUMBER'
+            }
+        }
+
+        stage('retrieve the public ip') {
+            steps {
+                sh 'curl ifconfig.io'
             }
         }
 
