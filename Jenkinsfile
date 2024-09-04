@@ -269,14 +269,14 @@ pipeline {
         }
 
         // Helm Deployment Stage
-        stage('Deploy with Helm') {
-            steps {
-                sh """
-                helm upgrade --install my-java-app ./java-application \
-                    --values ./java-application/dev-values.yaml
-                """
-            }
-        }
+        // stage('Deploy with Helm') {
+        //     steps {
+        //         sh """
+        //         helm upgrade --install my-java-app ./java-application \
+        //             --values ./java-application/dev-values.yaml
+        //         """
+        //     }
+        // }
 
     }
 }
